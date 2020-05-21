@@ -74,3 +74,22 @@ time_t getNTPtime(void)
         return NTP_t;
     }
 }
+
+void drawOLED_1(time_t locoMoco)
+{
+  char hourBuffer[10];
+  sprintf(hourBuffer, "%02u", hour(locoMoco));
+  // itoa(tm.Hour), hourBuffer, 10);
+
+  char minuteBuffer[10];
+  sprintf(minuteBuffer, "%02u", minute(locoMoco));
+  // itoa(tm.Minute, minuteBuffer, 10);
+
+  OLED_1.clearBuffer(); // clear the internal memory
+  OLED_1.setFont(u8g2_font_logisoso42_tn);
+  // char buffer[7];
+  OLED_1.drawStr(0, 42, hourBuffer);
+
+  OLED_1.drawStr(60, 62, minuteBuffer);
+  OLED_1.sendBuffer(); // transfer internal memory to the display
+}
