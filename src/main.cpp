@@ -102,7 +102,7 @@ void loop()
           Serial.println("DS1307 read error!  Please check the circuitry.");
           Serial.println();
         }
-        delay(9000);
+        delay(5000);
       }
     }
   }
