@@ -1,4 +1,14 @@
+/*TODO
 
+Add timezone 
+Add resetSettings jumper code
+Add display code
+
+
+Pins HW I2C
+D1 SCL
+D2 SDA
+*/
 
 #include "Arduino.h"
 #include <Wire.h>
@@ -12,8 +22,7 @@
 #include <Timezone.h>
 #include <U8g2lib.h>
 
-
-// #define NTPDEBUG ;
+// #define NTPDEBUG
 
 IPAddress timeServer(10, 10, 10, 102);
 
@@ -28,7 +37,6 @@ time_t NTP_t; //Time object for holding NTP time
 time_t t;     // time object for holding RTC time
 WiFiManager wifiManager;
 U8G2_SH1106_128X64_NONAME_F_HW_I2C OLED_1(U8G2_R0, U8X8_PIN_NONE);
-
 
 // Timezone Objects
 TimeChangeRule myDST = {"EDT", Second, Sun, Mar, 2, -240}; //UTC - 4 hours
@@ -59,23 +67,39 @@ void setup()
   OLED_1.setFont(u8g2_font_ncenB14_tr);
   OLED_1.drawStr(0, 20, "Booting!");
   OLED_1.sendBuffer();
+
   Serial.begin(115200);
   while (!Serial)
     ; // wait for serial
   delay(200);
+  // wifiManager.resetSettings();
+  wifiManager.setTimeout(15);
 
   wifiManager.autoConnect("NTPClock");
-  Serial.println(WiFi.localIP());
-  Serial.println("DS1307RTC Read Test");
-  Serial.println("-------------------");
-  Serial.println("Starting UDP");
+  // Serial.println(WiFi.localIP());
+  // Serial.println("DS1307RTC Read Test");
+  // Serial.println("-------------------");
   udp.begin(localPort);
+
+#ifdef NTPDEBUG
+  Serial.println("Starting UDP");
   Serial.print("Local port: ");
   Serial.println(udp.localPort());
-
+#endif
   // grab time from RTC to get started
 
   t = NTP_t = RTC.get();
+
+  // Shut off wifi if no connection - no reason to broadcast
+  if (WiFi.status() == 3)
+  {
+    Serial.printf("Wifi Connected; IP = %s\n", WiFi.localIP().toString().c_str());
+  }
+  else
+  {
+    WiFi.mode(WIFI_OFF);
+    Serial.println("Wifi Off\n");
+  }
 }
 
 void loop()
