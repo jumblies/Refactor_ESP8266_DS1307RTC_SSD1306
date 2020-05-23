@@ -27,8 +27,16 @@ void drawOLED_time(time_t locoMoco)
   sprintf(secondBuffer, "%02u", second(locoMoco));
 
   OLED_1.drawStr(0, 42, hourBuffer);
-  // OLED_1.setFont(u8g2_font_tenstamps_mf);
-  OLED_1.setFont(u8g2_font_michaelmouse_tu);
+  OLED_1.setFont(u8g2_font_tenstamps_mf);
+  // OLED_1.setFont(u8g2_font_michaelmouse_tu); //cartoon-y and hard to read
+  // OLED_1.setFont(u8g2_font_pieceofcake_mel_tr); //blocky and hard to read
+  // OLED_1.setFont(u8g2_font_sticker_mel_tr); //blocky and hard to read
   OLED_1.drawStr(95, 60, secondBuffer);
+  // wifi glyph
+  if (WiFi.status() == 3)
+  {
+    OLED_1.setFont(u8g2_font_siji_t_6x10);
+    OLED_1.drawGlyph(8, 60, 57584);
+  }
   OLED_1.sendBuffer(); // transfer internal memory to the display
 }

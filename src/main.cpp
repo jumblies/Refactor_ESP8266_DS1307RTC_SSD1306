@@ -54,7 +54,7 @@ void setup()
   if (drd.detectDoubleReset())
   {
     Serial.println("Double Reset Detected");
-    wifiManager.resetSettings();
+  wifiManager.resetSettings();
     drawOLED_wifiReset();
   }
   else
