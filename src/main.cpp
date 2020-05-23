@@ -23,11 +23,9 @@ D2 SDA
 #include <Timezone.h>
 #include <U8g2lib.h>
 #include <NTPClient.h>
-#include <DoubleResetDetector.h>
 
 // #define NTPDEBUG
-#define DRD_TIMEOUT 2
-#define DRD_ADDRESS 0
+
 
 #include "objects.h"
 
@@ -52,12 +50,9 @@ void setup()
     delay(200);
   }
 
-  if (drd.detectDoubleReset())
-  {
-    Serial.println("Double Reset Detected");
-    wifiManager.resetSettings();
-    drawOLED_wifiReset();
-  }
+  //    wifiManager.resetSettings();
+  // drawOLED_wifiReset();
+  // }
   else
   {
     Serial.println("No Double Reset Detected");
@@ -93,7 +88,6 @@ void setup()
 
 void loop()
 {
-  // drd.loop(); //checks for double resets
   unsigned long currentMillis = millis();
   unsigned long currentNTPMillis = millis();
   if (currentNTPMillis - previousNTPMillis >= ntpInterval)
