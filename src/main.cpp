@@ -48,13 +48,14 @@ void setup()
 
   Serial.begin(115200);
   while (!Serial)
-    ; // wait for serial
-  delay(200);
+  {
+    delay(200);
+  }
 
   if (drd.detectDoubleReset())
   {
     Serial.println("Double Reset Detected");
-  wifiManager.resetSettings();
+    wifiManager.resetSettings();
     drawOLED_wifiReset();
   }
   else
@@ -92,7 +93,7 @@ void setup()
 
 void loop()
 {
-  drd.loop(); //checks for double resets
+  // drd.loop(); //checks for double resets
   unsigned long currentMillis = millis();
   unsigned long currentNTPMillis = millis();
   if (currentNTPMillis - previousNTPMillis >= ntpInterval)
