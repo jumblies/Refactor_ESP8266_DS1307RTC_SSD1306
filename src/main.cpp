@@ -1,8 +1,9 @@
 /*TODO
 
-Add timezone 
-Add resetSettings jumper code
-Add display code
+STARTED Add adjustable timezones
+DONE Add resetSettings jumper code
+STARTED Add display code
+TODO  move ntp update loop to seperate function and just call it from here and loop below to shorten code    
 
 
 Pins HW I2C
@@ -22,8 +23,11 @@ D2 SDA
 #include <Timezone.h>
 #include <U8g2lib.h>
 #include <NTPClient.h>
+#include <DoubleResetDetector.h>
 
 // #define NTPDEBUG
+#define DRD_TIMEOUT 2
+#define DRD_ADDRESS 0
 
 #include "objects.h"
 
@@ -32,11 +36,7 @@ unsigned long previousMillis = 0;
 unsigned long previousNTPMillis = 0;
 // Global Timer vars
 const long interval = 1 * 1000;
-const long ntpInterval = 30 * 1000; // interval for NTP checks
-
-const char *monthName[12] = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+const long ntpInterval = 300 * 1000; // interval for NTP checks
 
 // Late includes - leave here.  needs objects instantiated first
 #include "displayTime.h"
@@ -44,18 +44,24 @@ const char *monthName[12] = {
 void setup()
 {
 
-  OLED_1.begin();
-  OLED_1.setI2CAddress(0x3C * 2);
-  OLED_1.clearBuffer();
-  OLED_1.setFont(u8g2_font_ncenB14_tr);
-  OLED_1.drawStr(0, 20, "Booting!");
-  OLED_1.sendBuffer();
+  drawOLED_boot();
 
   Serial.begin(115200);
   while (!Serial)
     ; // wait for serial
   delay(200);
-  wifiManager.resetSettings();
+
+  if (drd.detectDoubleReset())
+  {
+    Serial.println("Double Reset Detected");
+    wifiManager.resetSettings();
+    drawOLED_wifiReset();
+  }
+  else
+  {
+    Serial.println("No Double Reset Detected");
+  }
+
   wifiManager.setTimeout(15);
   wifiManager.autoConnect("NTPClock");
 
@@ -68,6 +74,14 @@ void setup()
   if (WiFi.status() == 3)
   {
     Serial.printf("Wifi Connected; IP = %s\n", WiFi.localIP().toString().c_str());
+
+    // TODO move this to seperate function and just call it from here and loop below to shorten code
+    if (timeClient.update())
+    {
+      Serial.print("-----------\nNTP updated\n-----------\n");
+      RTC.set(timeClient.getEpochTime());
+      NTP_t = (timeClient.getEpochTime());
+    }
   }
   else
   {
@@ -78,14 +92,14 @@ void setup()
 
 void loop()
 {
-
+  drd.loop(); //checks for double resets
   unsigned long currentMillis = millis();
   unsigned long currentNTPMillis = millis();
   if (currentNTPMillis - previousNTPMillis >= ntpInterval)
   {
     previousNTPMillis = currentNTPMillis;
 
-    // Next if only updates NTP time and RTC if a True response is returned from NTP 
+    // Next if only updates NTP time and RTC if a True response is returned from NTP
     if (timeClient.update())
     {
       Serial.print("-----------\nNTP updated\n-----------\n");
@@ -101,7 +115,7 @@ void loop()
       if ((t = RTC.get()))
       {
         drawOLED_time(myTZ.toLocal(t));
-        Serial.printf("NTP time NTP_t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \t", hour(NTP_t), minute(NTP_t), second(NTP_t), year(NTP_t), month(NTP_t), day(NTP_t));
+        Serial.printf("Last NTP_t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \t", hour(NTP_t), minute(NTP_t), second(NTP_t), year(NTP_t), month(NTP_t), day(NTP_t));
         Serial.printf("RTC time t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \t", hour(t), minute(t), second(t), year(t), month(t), day(t));
         Serial.printf("Local RTC time t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \n", hour(myTZ.toLocal(t)), minute(myTZ.toLocal(t)), second(myTZ.toLocal(t)), year(myTZ.toLocal(t)), month(myTZ.toLocal(t)), day(myTZ.toLocal(t)));
       }
