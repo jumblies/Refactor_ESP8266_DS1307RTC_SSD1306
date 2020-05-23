@@ -21,17 +21,13 @@ D2 SDA
 #include <WiFiManager.h>
 #include <Timezone.h>
 #include <U8g2lib.h>
+#include <NTPClient.h>
 
 // #define NTPDEBUG
 
-IPAddress timeServer(10, 10, 10, 102);
-
-unsigned int localPort = 2390;      // local port to listen for UDP packets
-const int NTP_PACKET_SIZE = 48;     // NTP time stamp is in the first 48 bytes of the message
-byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
-
 // Instantiate objects
 WiFiUDP udp;
+NTPClient timeClient(udp, "pool.ntp.org");
 tmElements_t tm;
 time_t NTP_t; //Time object for holding NTP time
 time_t t;     // time object for holding RTC time
@@ -49,7 +45,7 @@ unsigned long previousMillis = 0;
 unsigned long previousNTPMillis = 0;
 // Global Timer vars
 const long interval = 1 * 1000;
-const long ntpInterval = 5 * 1000; // interval for NTP checks
+const long ntpInterval = 30 * 1000; // interval for NTP checks
 
 const char *monthName[12] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -79,7 +75,8 @@ void setup()
   // Serial.println(WiFi.localIP());
   // Serial.println("DS1307RTC Read Test");
   // Serial.println("-------------------");
-  udp.begin(localPort);
+  // udp.begin(localPort);
+  timeClient.begin();
 
 #ifdef NTPDEBUG
   Serial.println("Starting UDP");
@@ -88,7 +85,7 @@ void setup()
 #endif
   // grab time from RTC to get started
 
-  t = NTP_t = RTC.get();
+  t /*= NTP_t */ = RTC.get();
 
   // Shut off wifi if no connection - no reason to broadcast
   if (WiFi.status() == 3)
@@ -110,16 +107,23 @@ void loop()
   if (currentNTPMillis - previousNTPMillis >= ntpInterval)
   {
     previousNTPMillis = currentNTPMillis;
-    NTP_t = getNTPtime();
+
+    // Next if only updates NTP time and RTC if a True response is returned from NTP 
+    if (timeClient.update())
+    {
+      Serial.print("-----------\nNTP updated\n-----------\n");
+      RTC.set(timeClient.getEpochTime());
+      NTP_t = (timeClient.getEpochTime());
+    }
   }
 
   if (currentMillis - previousMillis >= interval)
   {
     previousMillis = currentMillis;
     {
-      if (t = RTC.get())
+      if ((t = RTC.get()))
       {
-        drawOLED_1(myTZ.toLocal(t));
+        drawOLED_time(myTZ.toLocal(t));
         Serial.printf("NTP time NTP_t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \t", hour(NTP_t), minute(NTP_t), second(NTP_t), year(NTP_t), month(NTP_t), day(NTP_t));
         Serial.printf("RTC time t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \t", hour(t), minute(t), second(t), year(t), month(t), day(t));
         Serial.printf("Local RTC time t = %.2d:%.2d:%.2d %.4d-%.2d-%.2d \n", hour(myTZ.toLocal(t)), minute(myTZ.toLocal(t)), second(myTZ.toLocal(t)), year(myTZ.toLocal(t)), month(myTZ.toLocal(t)), day(myTZ.toLocal(t)));
