@@ -25,20 +25,7 @@ D2 SDA
 
 // #define NTPDEBUG
 
-// Instantiate objects
-WiFiUDP udp;
-NTPClient timeClient(udp, "pool.ntp.org");
-tmElements_t tm;
-time_t NTP_t; //Time object for holding NTP time
-time_t t;     // time object for holding RTC time
-WiFiManager wifiManager;
-U8G2_SH1106_128X64_NONAME_F_HW_I2C OLED_1(U8G2_R0, U8X8_PIN_NONE);
-
-// Timezone Objects
-TimeChangeRule myDST = {"EDT", Second, Sun, Mar, 2, -240}; //UTC - 4 hours
-TimeChangeRule mySTD = {"EST", First, Sun, Nov, 2, -300};  //UTC - 5 hours
-Timezone myTZ(myDST, mySTD);
-TimeChangeRule *tcr;
+#include "objects.h"
 
 // Globals
 unsigned long previousMillis = 0;
@@ -52,7 +39,7 @@ const char *monthName[12] = {
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 // Late includes - leave here.  needs objects instantiated first
-#include "helpers.h"
+#include "displayTime.h"
 
 void setup()
 {
@@ -68,23 +55,13 @@ void setup()
   while (!Serial)
     ; // wait for serial
   delay(200);
-  // wifiManager.resetSettings();
+  wifiManager.resetSettings();
   wifiManager.setTimeout(15);
-
   wifiManager.autoConnect("NTPClock");
-  // Serial.println(WiFi.localIP());
-  // Serial.println("DS1307RTC Read Test");
-  // Serial.println("-------------------");
-  // udp.begin(localPort);
+
   timeClient.begin();
 
-#ifdef NTPDEBUG
-  Serial.println("Starting UDP");
-  Serial.print("Local port: ");
-  Serial.println(udp.localPort());
-#endif
   // grab time from RTC to get started
-
   t /*= NTP_t */ = RTC.get();
 
   // Shut off wifi if no connection - no reason to broadcast
