@@ -23,9 +23,15 @@ D2 SDA
 #include <Timezone.h>
 #include <U8g2lib.h>
 #include <NTPClient.h>
-
+#include <EEPROM.h>
 // #define NTPDEBUG
 
+uint8_t tzIndex;
+uint8_t ee_tzIndex; //copy of tzIndex persisted in EEPROM
+const char *dstNames[] = {"EDT", "CDT", "MDT", "PDT"};
+const char *stdNames[] = {"EST", "CST", "MST", "PST"};
+const int dstOffsets[] = {-240, -300, -360, -420};
+const int stdOffsets[] = {-300, -360, -420, -480};
 
 #include "objects.h"
 
@@ -50,10 +56,28 @@ void setup()
     delay(200);
   }
 
-  //    wifiManager.resetSettings();
-  // drawOLED_wifiReset();
-  // }
+  //  wifiManager.resetSettings();
+
+  uint8_t myEEPROM_data = 255;
+  uint8_t myEEPROM_address = 0;
+
+  EEPROM.begin(512);
+
+  if (EEPROM.read(0) != myEEPROM_data)
+  {
+    EEPROM.write(0, myEEPROM_data);
+    if (EEPROM.commit())
+    {
+      Serial.println("EEPROM successfully committed");
+    }
+    else
+    {
+      Serial.println("ERROR! EEPROM commit failed");
+    }
+  }
   
+  Serial.printf("\n Your EEPROM value at %.3d is %.3d\n",myEEPROM_address, EEPROM.read(myEEPROM_address));
+
   wifiManager.setTimeout(15);
   wifiManager.autoConnect("NTPClock");
 
@@ -77,7 +101,8 @@ void setup()
   }
   else
   {
-    WiFi.mode(WIFI_OFF);
+    WiFi.forceSleepBegin();
+    delay(1);
     Serial.println("Wifi Off\n");
   }
 }
