@@ -53,11 +53,7 @@ void setup()
   //    wifiManager.resetSettings();
   // drawOLED_wifiReset();
   // }
-  else
-  {
-    Serial.println("No Double Reset Detected");
-  }
-
+  
   wifiManager.setTimeout(15);
   wifiManager.autoConnect("NTPClock");
 

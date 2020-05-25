@@ -11,8 +11,12 @@ void drawOLED_boot(void)
   OLED_1.begin();
   OLED_1.setI2CAddress(0x3C * 2);
   OLED_1.clearBuffer();
-  OLED_1.setFont(u8g2_font_ncenB14_tr);
-  OLED_1.drawStr(0, 20, "Booting!");
+  // OLED_1.setFont(u8g2_font_ncenB14_tr);
+  // OLED_1.drawStr(0, 20, "Booting!");
+
+  OLED_1.setFont(u8g2_font_open_iconic_www_8x_t);
+  OLED_1.drawGlyph(30, 64, 81);
+
   OLED_1.sendBuffer();
 }
 
@@ -32,6 +36,21 @@ void drawOLED_time(time_t locoMoco)
   // OLED_1.setFont(u8g2_font_pieceofcake_mel_tr); //blocky and hard to read
   // OLED_1.setFont(u8g2_font_sticker_mel_tr); //blocky and hard to read
   OLED_1.drawStr(95, 60, secondBuffer);
+
+  // Fun with glyphs
+  if (second(locoMoco) % 2 /*== 0*/)
+  {
+    // OLED_1.setFont(u8g2_font_unifont_t_0_76);
+    OLED_1.setFont(u8g2_font_unifont_t_0_76);
+    OLED_1.drawGlyph(20, 60, 9762); //nuclear
+    
+  }
+  else
+  {
+    OLED_1.setFont(u8g2_font_unifont_t_0_76);
+    OLED_1.drawGlyph(20, 60, 9763);  //Biohazard
+    // OLED_1.drawGlyph(20, 60, 9783);
+  }
   // wifi glyph
   if (WiFi.status() == 3)
   {
