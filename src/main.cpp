@@ -39,8 +39,9 @@ const int stdOffsets[] = {-300, -360, -420, -480};
 unsigned long previousMillis = 0;
 unsigned long previousNTPMillis = 0;
 // Global Timer vars
-const long interval = 1 * 1000;
-const long ntpInterval = 300 * 1000; // interval for NTP checks
+const uint16_t interval = 1 * 1000; // 1 second loop interval
+const uint8_t ntpSeconds = 300; //NTP update interval in seconds
+const uint16_t ntpInterval = ntpSeconds * 1000; // interval for NTP checks
 
 // Late includes - leave here.  needs objects instantiated first
 #include "displayTime.h"
