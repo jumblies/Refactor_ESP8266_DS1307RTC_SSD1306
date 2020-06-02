@@ -22,16 +22,15 @@ void drawOLED_boot(void)
   OLED_1.sendBuffer();
 }
 
-void drawOLED_time(time_t locoMoco)
-//locomoco is the cutesy name for the local time var
+void drawOLED_time(time_t localTime_t) //localTime_t is the  name for the local time var
 {
 
   char hourBuffer[10];
-  sprintf(hourBuffer, "%02u:%02u", hour(locoMoco), minute(locoMoco));
+  sprintf(hourBuffer, "%02u:%02u", hour(localTime_t), minute(localTime_t));
   OLED_1.clearBuffer(); // clear the internal memory
   OLED_1.setFont(u8g2_font_logisoso42_tn);
   char secondBuffer[3];
-  sprintf(secondBuffer, "%02u", second(locoMoco));
+  sprintf(secondBuffer, "%02u", second(localTime_t));
 
   OLED_1.drawStr(0, 42, hourBuffer);
   OLED_1.setFont(u8g2_font_tenstamps_mf);
@@ -40,7 +39,7 @@ void drawOLED_time(time_t locoMoco)
   // OLED_1.setFont(u8g2_font_sticker_mel_tr); //blocky and hard to read
   OLED_1.drawStr(95, 60, secondBuffer);
 
-  if ((locoMoco - NTP_t)  <= ntpSeconds )
+  if ((localTime_t - NTP_t)  <= ntpSeconds )
   {
     // OLED_1.setFont(u8g2_font_unifont_t_symbols);
     OLED_1.setFont(u8g2_font_open_iconic_www_2x_t);
@@ -50,7 +49,7 @@ void drawOLED_time(time_t locoMoco)
   }
 
   // // Fun with glyphs
-  // if (second(locoMoco) % 2 /*== 0*/)
+  // if (second(localTime_t) % 2 /*== 0*/)
   // {
   //   // OLED_1.setFont(u8g2_font_unifont_t_0_76);
   //   OLED_1.setFont(u8g2_font_unifont_t_0_76);

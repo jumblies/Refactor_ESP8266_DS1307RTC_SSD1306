@@ -26,12 +26,12 @@ D2 SDA
 #include <EEPROM.h>
 // #define NTPDEBUG
 
-uint8_t tzIndex;
-uint8_t ee_tzIndex; //copy of tzIndex persisted in EEPROM
-const char *dstNames[] = {"EDT", "CDT", "MDT", "PDT"};
-const char *stdNames[] = {"EST", "CST", "MST", "PST"};
-const int dstOffsets[] = {-240, -300, -360, -420};
-const int stdOffsets[] = {-300, -360, -420, -480};
+// uint8_t tzIndex;
+// uint8_t ee_tzIndex; //copy of tzIndex persisted in EEPROM
+// const char *dstNames[] = {"EDT", "CDT", "MDT", "PDT"};
+// const char *stdNames[] = {"EST", "CST", "MST", "PST"};
+// const int dstOffsets[] = {-240, -300, -360, -420};
+// const int stdOffsets[] = {-300, -360, -420, -480};
 
 #include "objects.h"
 
@@ -39,9 +39,9 @@ const int stdOffsets[] = {-300, -360, -420, -480};
 unsigned long previousMillis = 0;
 unsigned long previousNTPMillis = 0;
 // Global Timer vars
-const uint16_t interval = 1 * 1000; // 1 second loop interval
-const uint8_t ntpSeconds = 300; //NTP update interval in seconds
-const uint16_t ntpInterval = ntpSeconds * 1000; // interval for NTP checks
+const uint16_t interval = 1000; // 1 second loop interval
+const uint16_t ntpSeconds = 300; //NTP update interval in seconds
+const uint32_t ntpInterval = ntpSeconds * 1000; // interval for NTP checks
 
 // Late includes - leave here.  needs objects instantiated first
 #include "displayTime.h"
@@ -63,9 +63,9 @@ void setup()
 
   EEPROM.begin(512);
 
-  if (EEPROM.read(0) != myEEPROM_data)
+  if (EEPROM.read(myEEPROM_address) != myEEPROM_data)
   {
-    EEPROM.write(0, myEEPROM_data);
+    EEPROM.write(myEEPROM_address, myEEPROM_data);
     if (EEPROM.commit())
     {
       Serial.println("EEPROM successfully committed");
