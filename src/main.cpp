@@ -47,7 +47,6 @@ const long ntpInterval = 300 * 1000; // interval for NTP checks
 
 void setup()
 {
-
   drawOLED_boot();
 
   Serial.begin(115200);
@@ -75,8 +74,8 @@ void setup()
       Serial.println("ERROR! EEPROM commit failed");
     }
   }
-  
-  Serial.printf("\n Your EEPROM value at %.3d is %.3d\n",myEEPROM_address, EEPROM.read(myEEPROM_address));
+
+  Serial.printf("\n Your EEPROM value at %.3d is %.3d\n", myEEPROM_address, EEPROM.read(myEEPROM_address));
 
   wifiManager.setTimeout(15);
   wifiManager.autoConnect("NTPClock");

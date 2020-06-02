@@ -1,6 +1,7 @@
 // Instantiate objects
 WiFiUDP udp;
 NTPClient timeClient(udp, "pool.ntp.org");
+// NTPClient timeClient(udp, "ntp.buttplug.org");  // For testing the icon that confirms an NTP time
 tmElements_t tm;
 time_t NTP_t; //Time object for holding NTP time
 time_t t;     // time object for holding RTC time
