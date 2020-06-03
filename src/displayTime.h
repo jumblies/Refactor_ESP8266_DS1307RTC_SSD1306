@@ -39,7 +39,7 @@ void drawOLED_time(time_t localTime_t) //localTime_t is the  name for the local 
   // OLED_1.setFont(u8g2_font_sticker_mel_tr); //blocky and hard to read
   OLED_1.drawStr(95, 60, secondBuffer);
 
-  if ((localTime_t - NTP_t)  <= ntpSeconds )
+  if ((t - NTP_t)  <= ntpSeconds )
   {
     // OLED_1.setFont(u8g2_font_unifont_t_symbols);
     OLED_1.setFont(u8g2_font_open_iconic_www_2x_t);

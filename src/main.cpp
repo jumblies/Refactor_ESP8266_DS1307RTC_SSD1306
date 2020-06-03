@@ -84,6 +84,7 @@ void setup()
   timeClient.begin();
 
   // grab time from RTC to get started
+  // t  = NTP_t = RTC.get();
   t /*= NTP_t */ = RTC.get();
 
   // Shut off wifi if no connection - no reason to broadcast
@@ -101,6 +102,7 @@ void setup()
   }
   else
   {
+    NTP_t = RTC.get();  // if no ntp/internet connection get NTP from RTC.
     WiFi.forceSleepBegin();
     delay(1);
     Serial.println("Wifi Off\n");
