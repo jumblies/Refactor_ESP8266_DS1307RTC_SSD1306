@@ -42,6 +42,8 @@ unsigned long previousNTPMillis = 0;
 const uint16_t interval = 1000; // 1 second loop interval
 const uint16_t ntpSeconds = 300; //NTP update interval in seconds
 const uint32_t ntpInterval = ntpSeconds * 1000; // interval for NTP checks
+uint8_t timerOn = 0; 
+
 
 // Late includes - leave here.  needs objects instantiated first
 #include "displayTime.h"
