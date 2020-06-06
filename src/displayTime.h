@@ -14,7 +14,7 @@ void drawOLED_boot(void)
   OLED_1.clearBuffer();
   // OLED_1.setFont(u8g2_font_ncenB14_tr);
   // OLED_1.drawStr(0, 20, "Booting!");
-  OLED_1.setContrast(255);
+  OLED_1.setContrast(0);
 
   OLED_1.setFont(u8g2_font_open_iconic_www_8x_t);
   OLED_1.drawGlyph(30, 64, 81);
@@ -32,6 +32,15 @@ void drawOLED_time(time_t localTime_t) //localTime_t is the  name for the local 
   char secondBuffer[3];
   sprintf(secondBuffer, "%02u", second(localTime_t));
 
+  if (localTime_t % 2 == 0)
+  {
+    OLED_1.setContrast(255);
+  }
+  else
+  {
+    OLED_1.setContrast(0);
+  }
+
   OLED_1.drawStr(0, 42, hourBuffer);
   OLED_1.setFont(u8g2_font_tenstamps_mf);
   // OLED_1.setFont(u8g2_font_michaelmouse_tu); //cartoon-y and hard to read
@@ -39,7 +48,7 @@ void drawOLED_time(time_t localTime_t) //localTime_t is the  name for the local 
   // OLED_1.setFont(u8g2_font_sticker_mel_tr); //blocky and hard to read
   OLED_1.drawStr(95, 60, secondBuffer);
 
-  if ((t - NTP_t)  <= ntpSeconds )
+  if ((t - NTP_t) <= ntpSeconds)
   {
     // OLED_1.setFont(u8g2_font_unifont_t_symbols);
     OLED_1.setFont(u8g2_font_open_iconic_www_2x_t);
